@@ -22,7 +22,7 @@ export default function Hero() {
           >
             <span className="w-2 h-2 rounded-full bg-[#eaa879] animate-pulse" />
             <span className="text-xs font-medium text-[#eaa879]">
-              Software Development Company — Middle East &amp; Africa
+              New Era, Special Engines.
             </span>
           </motion.div>
 
