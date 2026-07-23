@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     description: DEFAULT_DESCRIPTION,
     images: [
       {
-        url: "/800x800_white_logo.png",
+        url: "/favicon.ico",
         width: 800,
         height: 800,
         alt: "Era Engines - Custom Software Development Company",
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Era Engines | Custom Software Development Company",
     description: DEFAULT_DESCRIPTION,
-    images: ["/800x800_white_logo.png"],
+    images: ["/favicon.ico"],
     creator: "@eraengines",
   },
   robots: {
@@ -83,9 +83,9 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
   },
   icons: {
-    icon: "/800x800_white_logo.png",
-    shortcut: "/800x800_white_logo.png",
-    apple: "/800x800_white_logo.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
   verification: {
     google: "YOUR_GOOGLE_SEARCH_CONSOLE_VERIFICATION_CODE",
@@ -102,7 +102,7 @@ export default function RootLayout({
     "@type": "Organization",
     name: "Era Engines",
     url: SITE_URL,
-    logo: `${SITE_URL}/800x800_white_logo.png`,
+    logo: `${SITE_URL}/favicon.ico`,
     description: DEFAULT_DESCRIPTION,
     foundingDate: "2024",
     sameAs: [
@@ -148,7 +148,7 @@ export default function RootLayout({
       name: "Era Engines",
       logo: {
         "@type": "ImageObject",
-        url: `${SITE_URL}/800x800_white_logo.png`,
+        url: `${SITE_URL}/favicon.ico`,
       },
     },
   };
@@ -158,7 +158,7 @@ export default function RootLayout({
     "@type": "ProfessionalService",
     name: "Era Engines",
     url: SITE_URL,
-    logo: `${SITE_URL}/800x800_white_logo.png`,
+    logo: `${SITE_URL}/favicon.ico`,
     description: DEFAULT_DESCRIPTION,
     serviceType: [
       "Custom Software Development",
