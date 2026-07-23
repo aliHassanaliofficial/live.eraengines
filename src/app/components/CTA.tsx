@@ -5,7 +5,7 @@ import { appearEasing } from "./animations";
 
 export default function CTA() {
   return (
-    <section className="py-[62px] sm:py-[120px] px-4 sm:px-8">
+    <section id="contact" className="py-[62px] sm:py-[120px] px-4 sm:px-8">
       <div className="max-w-[1200px] mx-auto">
         <motion.div
           initial={{ opacity: 0.001, scale: 0.9 }}
@@ -21,24 +21,24 @@ export default function CTA() {
 
           <div className="relative">
             <h2 className="text-[26px] sm:text-[32px] font-bold text-white leading-[1.3] mb-6">
-              Ready to ship better software, faster?
+              Ready to Build Something Great?
             </h2>
             <p className="text-base text-[#949fa6] mb-10 max-w-xl mx-auto leading-[1.6]">
-              Join 10,000+ engineering teams who trust Era Engines for their CI/CD,
-              monitoring, and cloud infrastructure. Start free in under 2 minutes.
+              Whether you have a fully scoped project or just an idea on paper, we&apos;re ready to
+              help you turn it into software that works. Start with a free consultation.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
                 href="#pricing"
-                className="inline-block bg-white text-[#0b0b0d] px-10 py-4 rounded-[100px] text-sm font-semibold hover:opacity-90 transition-opacity shadow-[inset_0px_1px_10px_0px_rgba(255,255,255,0.05)]"
+                className="inline-block bg-white text-[#0b0b0d] px-10 py-4 rounded-[100px] text-sm font-semibold hover:opacity-90 transition-opacity"
               >
-                Start free trial
+                Get Free Consultation
               </a>
               <a
                 href="https://calendly.com"
                 className="inline-block text-[#949fa6] px-10 py-4 rounded-[100px] text-sm font-semibold border border-[#19191a] hover:border-[#eaa879]/30 hover:text-white transition-colors"
               >
-                Talk to sales
+                Book a Discovery Call
               </a>
             </div>
           </div>

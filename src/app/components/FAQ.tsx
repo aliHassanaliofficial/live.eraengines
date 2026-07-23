@@ -6,20 +6,28 @@ import { appearEasing } from "./animations";
 
 const faqs = [
   {
-    q: "How does Era Engines pricing work?",
-    a: "We offer usage-based pricing for compute and bandwidth, plus a flat monthly fee per developer seat. You only pay for what your team actually uses, with generous free tiers for hobby projects and startups.",
+    q: "What types of businesses does Era Engines work with?",
+    a: "We work with startups, small and medium businesses, large enterprises, healthcare organizations, educational institutions, government bodies, and entrepreneurs with software ideas. If you need software built, we can help.",
   },
   {
-    q: "Can I self-host Era Engines?",
-    a: "Yes. Our Enterprise plan includes a self-hosted deployment option that runs in your own VPC or on-premise infrastructure. You get the same features as our cloud, with full data sovereignty.",
+    q: "What technologies does Era Engines use?",
+    a: "We work across modern technology stacks — React, Next.js, Node.js, Python, Flutter, React Native, and more. We choose the right tools for your specific project, not the ones we happen to know best.",
   },
   {
-    q: "Which programming languages and frameworks are supported?",
-    a: "Era Engines works with any language that can run in a Docker container — that's over 40 first-class adapters including Node.js, Python, Go, Rust, Java, Ruby, PHP, .NET, and Elixir. Framework-specific presets for Next.js, Django, Rails, Spring, and more.",
+    q: "How does pricing work for custom projects?",
+    a: "Because every project is unique, we scope and quote based on your specific goals after an initial discovery conversation. No one-size-fits-all pricing — you pay for what your project actually needs.",
   },
   {
-    q: "Is my source code and data secure?",
-    a: "Absolutely. We're SOC 2 Type II certified, with encryption at rest and in transit. Source code never leaves your region, and we offer customer-managed encryption keys (CMEK) for enterprise customers.",
+    q: "Do you offer support after launch?",
+    a: "Yes. Every project includes a post-launch support window, and most clients move into an ongoing maintenance, support, or consulting arrangement. We stay involved as your long-term technical partner.",
+  },
+  {
+    q: "Can you integrate AI into our existing systems?",
+    a: "Absolutely. AI integration and business automation is one of our core services. We can add intelligent features to your existing products or build new AI-powered solutions from scratch.",
+  },
+  {
+    q: "Do you work with clients outside the Middle East and Africa?",
+    a: "While our vision is to become a leading software company in the MEA region, we work with clients globally. Great software has no borders.",
   },
 ];
 
@@ -40,7 +48,7 @@ export default function FAQ() {
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-base text-[#949fa6]">
-            Everything you need to know about Era Engines.
+            Everything you need to know about working with Era Engines.
           </p>
         </motion.div>
 

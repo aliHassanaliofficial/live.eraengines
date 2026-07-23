@@ -5,10 +5,10 @@ import { appearEasing } from "./animations";
 
 export default function Hero() {
   return (
-    <section className="relative pt-40 pb-20 sm:pt-48 sm:pb-28 overflow-hidden">
+    <section id="hero" className="relative pt-40 pb-20 sm:pt-48 sm:pb-28 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white rounded-full opacity-[0.02] blur-[40px] animate-pulse-glow" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-white rounded-full opacity-[0.03] blur-[40px] animate-pulse-glow" style={{ animationDelay: "2s" }} />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#eaa879] rounded-full opacity-[0.03] blur-[40px] animate-pulse-glow" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-white rounded-full opacity-[0.02] blur-[40px] animate-pulse-glow" style={{ animationDelay: "2s" }} />
       </div>
 
       <div className="relative max-w-[1200px] mx-auto px-4 sm:px-8">
@@ -17,12 +17,12 @@ export default function Hero() {
             initial={{ opacity: 0.001, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, ease: appearEasing }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50/10 border border-[#eaa879]/20 mb-6"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#eaa879]/20 mb-6"
             style={{ background: "rgba(234, 168, 121, 0.08)" }}
           >
             <span className="w-2 h-2 rounded-full bg-[#eaa879] animate-pulse" />
             <span className="text-xs font-medium text-[#eaa879]">
-              AI-powered SaaS for modern developers
+              Software Development Company — Middle East &amp; Africa
             </span>
           </motion.div>
 
@@ -33,9 +33,9 @@ export default function Hero() {
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.2] tracking-tight text-white"
             style={{ fontFamily: "Manrope" }}
           >
-            Ship code faster,{" "}
+            Build Software That{" "}
             <span className="bg-gradient-to-r from-[#eaa879] to-[#d4956a] bg-clip-text text-transparent">
-              scale smarter.
+              Solves Real Problems.
             </span>
           </motion.h1>
 
@@ -43,10 +43,11 @@ export default function Hero() {
             initial={{ opacity: 0.001, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, ease: appearEasing, delay: 0.2 }}
-            className="mt-6 text-base sm:text-lg text-[#949fa6] max-w-[600px] mx-auto leading-[1.6]"
+            className="mt-6 text-base sm:text-lg text-[#949fa6] max-w-[650px] mx-auto leading-[1.6]"
           >
-            Era Engines is the all-in-one SaaS platform for engineering teams.
-            Automate deployments, monitor performance, and ship reliable software at scale.
+            Era Engines is a full-service software company. We design, build, and maintain
+            custom web applications, mobile apps, SaaS platforms, and enterprise systems for
+            startups, SMEs, and large enterprises across the region.
           </motion.p>
 
           <motion.div
@@ -56,18 +57,27 @@ export default function Hero() {
             className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <a
-              href="#pricing"
-              className="inline-block bg-white text-[#0b0b0d] px-8 py-3.5 rounded-[100px] text-sm font-semibold hover:opacity-90 transition-opacity shadow-[inset_0px_1px_10px_0px_rgba(255,255,255,0.05)]"
+              href="#contact"
+              className="inline-block bg-white text-[#0b0b0d] px-8 py-3.5 rounded-[100px] text-sm font-semibold hover:opacity-90 transition-opacity"
             >
-              Start free trial
+              Get Free Consultation
             </a>
             <a
-              href="#features"
+              href="#services"
               className="inline-block text-[#949fa6] px-8 py-3.5 rounded-[100px] text-sm font-semibold border border-[#19191a] hover:border-[#eaa879]/30 hover:text-white transition-colors"
             >
-              See features
+              Explore Our Services
             </a>
           </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0.001, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, ease: appearEasing, delay: 0.4 }}
+            className="mt-6 text-sm text-[#949fa6]/60 max-w-[500px] mx-auto leading-[1.6]"
+          >
+            No commitment. Just a conversation about what you&apos;re building and how we can help.
+          </motion.p>
         </div>
       </div>
     </section>

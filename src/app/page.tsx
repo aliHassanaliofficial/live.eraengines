@@ -19,10 +19,10 @@ export default function Home() {
 
         <ContentSection
           imageSide="right"
-          badge="IDE"
-          title="A Cloud IDE that thinks like a developer"
-          description="Era Engines' cloud IDE comes pre-configured with linting, formatting, and AI-powered autocomplete. Open any repo in one click and start coding from any device, anywhere."
-          image="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=500&fit=crop&auto=format"
+          badge="WHO WE ARE"
+          title="More than a vendor. A technology partner."
+          description="Era Engines designs and builds custom software for businesses that need more than a vendor. We work alongside your team from the first idea to long after launch — as your hands-on technical partner, delivering world-class software at startup speed."
+          image="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=500&fit=crop&auto=format"
         />
 
         <Features />
@@ -33,10 +33,10 @@ export default function Home() {
 
         <ContentSection
           imageSide="left"
-          badge="Integrations"
-          title="Plug into your dev stack"
-          description="Native integrations with GitHub, GitLab, Bitbucket, VS Code, JetBrains, Slack, Jira, Linear, and 200+ other tools your team already uses every day."
-          image="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=500&fit=crop&auto=format"
+          badge="OUR VALUES"
+          title="Innovation, Quality, and Trust — in every line of code."
+          description="We believe great software starts with understanding the people who use it. Our core values — innovation, transparency, security, and excellence — drive every project we deliver and every relationship we build."
+          image="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop&auto=format"
         />
 
         <Stats />

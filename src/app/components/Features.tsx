@@ -5,46 +5,64 @@ import { appearEasing } from "./animations";
 
 const features = [
   {
-    title: "Version Control",
+    title: "Custom Software Development",
     description:
-      "Built-in Git workflows, pull request reviews, and branch management that helps your engineering team collaborate on code without friction.",
+      "Tailor-made software built from the ground up to solve your specific business challenges. No templates, no shortcuts.",
     image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=300&fit=crop&auto=format",
   },
   {
-    title: "Cloud Infrastructure",
+    title: "Web Application Development",
     description:
-      "Deploy to AWS, GCP, or Azure with zero-downtime rollouts. Auto-scaling, load balancing, and SSL managed out of the box.",
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=300&fit=crop&auto=format",
+      "Fast, responsive, and secure web applications built with modern frameworks and designed for real-world business workflows.",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=300&fit=crop&auto=format",
   },
   {
-    title: "Team Collaboration",
+    title: "Mobile App Development",
     description:
-      "Real-time code review, inline comments, and shared debugging sessions that keep distributed engineering teams in sync.",
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=300&fit=crop&auto=format",
+      "Native Android and iOS applications built for performance, designed for users, and built to scale with your business.",
+    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=300&fit=crop&auto=format",
   },
   {
-    title: "API Integrations",
+    title: "SaaS Product Development",
     description:
-      "Connect with GitHub, GitLab, Jira, Slack, and 200+ developer tools through our open API and pre-built connectors.",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=300&fit=crop&auto=format",
-  },
-  {
-    title: "Performance Monitoring",
-    description:
-      "Real-time APM with distributed tracing, error tracking, and custom metrics to help you debug production issues in seconds.",
+      "Turn your SaaS idea into a fully productized platform. From MVP to production-ready, we build the product your customers will love.",
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=300&fit=crop&auto=format",
   },
   {
-    title: "CI/CD Pipelines",
+    title: "Enterprise Software",
     description:
-      "YAML-configurable pipelines with parallel test runs, artifact caching, and instant rollbacks. Ship to production 10x faster.",
-    image: "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=600&h=300&fit=crop&auto=format",
+      "Robust, secure, and scalable systems designed for large organizations. ERP, CRM, HR, and custom enterprise platforms.",
+    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=300&fit=crop&auto=format",
+  },
+  {
+    title: "AI Integration & Automation",
+    description:
+      "Integrate artificial intelligence into your products and automate manual business processes with smart, data-driven workflows.",
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=300&fit=crop&auto=format",
+  },
+  {
+    title: "API Development & Integrations",
+    description:
+      "Build and connect APIs, integrate third-party services, and create seamless data flows between your systems.",
+    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=300&fit=crop&auto=format",
+  },
+  {
+    title: "Cloud-Based Solutions",
+    description:
+      "Cloud-first architecture designed for reliability, scalability, and cost-efficiency. AWS, Azure, and GCP deployments.",
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=300&fit=crop&auto=format",
+  },
+  {
+    title: "UI/UX Design",
+    description:
+      "Interfaces designed around how your real customers think, navigate, and act. Beautiful design that actually works.",
+    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=300&fit=crop&auto=format",
   },
 ];
 
 export default function Features() {
   return (
-    <section id="features" className="py-[62px] sm:py-[120px] px-4 sm:px-8">
+    <section id="services" className="py-[62px] sm:py-[120px] px-4 sm:px-8">
       <div className="max-w-[1200px] mx-auto">
         <motion.div
           initial={{ opacity: 0.001, scale: 0.9 }}
@@ -54,11 +72,11 @@ export default function Features() {
           className="text-center mb-16"
         >
           <h2 className="text-[26px] sm:text-[32px] font-bold text-white leading-[1.3]">
-            Built for modern engineering teams
+            Our Services
           </h2>
           <p className="mt-4 text-base text-[#949fa6] max-w-[600px] mx-auto leading-[1.6]">
-            Everything you need to write, ship, and monitor production software —
-            all in one developer-first platform.
+            From custom software development to AI integration, we cover the full spectrum of
+            technology services your business needs to grow.
           </p>
         </motion.div>
 

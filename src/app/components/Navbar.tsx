@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { label: "Features", href: "#features" },
-  { label: "Product", href: "#product" },
+  { label: "Services", href: "#services" },
+  { label: "Products", href: "#products" },
+  { label: "Process", href: "#process" },
   { label: "Pricing", href: "#pricing" },
-  { label: "Docs", href: "#" },
 ];
 
 export default function Navbar() {
@@ -35,7 +35,6 @@ export default function Navbar() {
         transition: "padding 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
-      {/* Pill bar (clipped for rounded shape) */}
       <motion.div
         initial={{ opacity: 0.001, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -72,7 +71,6 @@ export default function Navbar() {
           }}
         />
 
-        {/* Desktop */}
         <div
           className="hidden md:flex items-center justify-between w-full h-full relative z-10"
           style={{ padding: scrolled ? "0 24px" : "0 0" }}
@@ -108,9 +106,7 @@ export default function Navbar() {
 
           <div className="flex items-center justify-end shrink-0" style={{ width: "180px" }}>
             <a
-              href="https://calendly.com"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#contact"
               className="relative whitespace-nowrap overflow-hidden"
               style={{
                 fontFamily: "Manrope, sans-serif",
@@ -126,7 +122,7 @@ export default function Navbar() {
                 transition: "padding 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
             >
-              Book a Call
+              Start Your Project
               <span
                 style={{
                   position: "absolute",
@@ -146,7 +142,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile (inside the pill — only the bar) */}
         <div className="md:hidden flex items-center justify-between w-full h-full relative z-10" style={{ padding: "0 4px" }}>
           <a href="#hero" className="shrink-0" style={{ width: "72px", height: "72px" }}>
             <img
@@ -191,7 +186,6 @@ export default function Navbar() {
         </div>
       </motion.div>
 
-      {/* Mobile menu — OUTSIDE the overflow-hidden pill */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -206,9 +200,9 @@ export default function Navbar() {
               borderRadius: scrolled ? "20px" : "0px",
               marginTop: "8px",
               border: scrolled ? "1px solid rgba(255,255,255,0.08)" : "none",
-              background: scrolled ? "rgba(11,11,13,0.95)" : "rgba(11,11,13,0.95)",
-              backdropFilter: scrolled ? "blur(24px)" : "blur(24px)",
-              WebkitBackdropFilter: scrolled ? "blur(24px)" : "blur(24px)",
+              background: "rgba(11,11,13,0.95)",
+              backdropFilter: "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
               boxShadow: scrolled
                 ? "inset 0 0 0 1px rgba(255,255,255,0.05)"
                 : "none",
@@ -237,9 +231,7 @@ export default function Navbar() {
               ))}
               <hr className="border-white/[0.06] my-2" />
               <a
-                href="https://calendly.com"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#contact"
                 onClick={() => setMenuOpen(false)}
                 className="block text-center px-4 py-3 rounded-[100px] mt-2"
                 style={{
@@ -252,7 +244,7 @@ export default function Navbar() {
                   textDecoration: "none",
                 }}
               >
-                Book a Call
+                Start Your Project
               </a>
             </div>
           </motion.div>

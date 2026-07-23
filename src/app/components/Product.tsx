@@ -5,39 +5,55 @@ import { appearEasing } from "./animations";
 
 const products = [
   {
-    badge: "Code",
-    title: "Cloud IDE & Repositories",
+    badge: "Healthcare",
+    title: "Clinic Management System",
     description:
-      "Write, review, and merge code from anywhere. Branch protection rules, code owners, and automated PR checks keep your main branch green.",
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop&auto=format",
+      "End-to-end clinic management — patient records, appointments, billing, and prescriptions in one secure platform built for healthcare providers.",
+    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop&auto=format",
   },
   {
-    badge: "Deploy",
-    title: "One-Click Deployments",
+    badge: "Education",
+    title: "School & University Management",
     description:
-      "Push to main and watch your code ship globally. Preview environments for every pull request, instant rollbacks, and zero-downtime releases.",
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=400&fit=crop&auto=format",
+      "Complete academic management — student enrollment, attendance, grades, scheduling, and parent portals for schools and universities.",
+    image: "https://images.unsplash.com/photo-1523050854058-8df90110c8f1?w=800&h=400&fit=crop&auto=format",
   },
   {
-    badge: "Monitor",
-    title: "Application Monitoring",
+    badge: "Enterprise",
+    title: "ERP & Business Systems",
     description:
-      "Distributed tracing, structured logs, and real-time alerts. Find the root cause of bugs in seconds, not hours, with full-stack observability.",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop&auto=format",
+      "Integrated ERP, CRM, HR & payroll, inventory, and POS systems designed around your actual business processes, not the other way around.",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop&auto=format",
   },
   {
-    badge: "Scale",
-    title: "Auto-Scaling Infrastructure",
+    badge: "E-Commerce",
+    title: "E-Commerce & Customer Portals",
     description:
-      "Handle traffic spikes automatically with smart auto-scaling. Pay only for what you use, with usage-based pricing and detailed cost analytics.",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=400&fit=crop&auto=format",
+      "Custom e-commerce platforms, booking systems, and customer portals built for conversion, performance, and long-term growth.",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=400&fit=crop&auto=format",
   },
 ];
 
 export default function Product() {
   return (
-    <section id="product" className="py-[62px] sm:py-[120px] px-4 sm:px-8">
+    <section id="products" className="py-[62px] sm:py-[120px] px-4 sm:px-8">
       <div className="max-w-[1200px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0.001, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.7, ease: appearEasing }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-[26px] sm:text-[32px] font-bold text-white leading-[1.3]">
+            Our Products
+          </h2>
+          <p className="mt-4 text-base text-[#949fa6] max-w-[600px] mx-auto leading-[1.6]">
+            Industry-specific software products built from years of experience solving
+            real problems for real businesses.
+          </p>
+        </motion.div>
+
         <div className="grid sm:grid-cols-2 gap-6">
           {products.map((product, index) => (
             <motion.div

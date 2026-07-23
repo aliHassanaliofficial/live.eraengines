@@ -5,22 +5,22 @@ import { appearEasing } from "./animations";
 
 const stats = [
   {
-    value: "2.4B+",
-    label: "Deployments shipped through Era Engines across all customer infrastructure.",
+    value: "50+",
+    label: "Projects delivered across web, mobile, and enterprise systems.",
   },
   {
-    value: "180K+",
-    label: "Active developers building, testing, and monitoring production workloads daily.",
+    value: "10+",
+    label: "Industries served — from healthcare and education to retail and logistics.",
   },
   {
-    value: "99.99%",
-    label: "Platform uptime SLA guaranteed for every customer on every plan.",
+    value: "98%",
+    label: "Client satisfaction. Long-term partnerships, not one-time deliveries.",
   },
 ];
 
 export default function Stats() {
   return (
-    <section id="action" className="py-[62px] sm:py-[120px] px-4 sm:px-8">
+    <section className="py-[62px] sm:py-[120px] px-4 sm:px-8">
       <div className="max-w-[1200px] mx-auto">
         <motion.div
           initial={{ opacity: 0.001, scale: 0.9 }}
@@ -30,8 +30,11 @@ export default function Stats() {
           className="text-center mb-16 max-w-[900px] mx-auto"
         >
           <h2 className="text-[26px] sm:text-[32px] font-bold text-white leading-[1.3]">
-            The infrastructure powering tomorrow&apos;s software.
+            Era Engines by the Numbers
           </h2>
+          <p className="mt-4 text-base text-[#949fa6] max-w-[500px] mx-auto leading-[1.6]">
+            Building world-class software, one project at a time.
+          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8">

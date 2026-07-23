@@ -5,41 +5,43 @@ import { appearEasing } from "./animations";
 
 const plans = [
   {
-    name: "Hobby",
-    price: "$0",
-    period: "/month",
-    description: "Free forever for solo developers",
+    name: "Starter",
+    price: "Custom",
+    period: "",
+    description: "For startups and small businesses",
     features: [
-      "1 developer seat",
-      "Unlimited public repos",
-      "100 build minutes/month",
-      "Community support",
+      "Single web or mobile application",
+      "UI/UX design included",
+      "Cloud hosting setup",
+      "3 months post-launch support",
+      "1 revision cycle",
     ],
   },
   {
-    name: "Team",
-    price: "$20",
-    period: "/developer/month",
-    description: "For growing engineering teams",
+    name: "Growth",
+    price: "Custom",
+    period: "",
+    description: "For growing companies with complex needs",
     features: [
-      "Unlimited team members",
-      "Unlimited private repos",
-      "10,000 build minutes/month",
-      "Priority email support",
-      "Preview environments",
+      "Full-stack custom development",
+      "API & third-party integrations",
+      "AI & automation features",
+      "6 months post-launch support",
+      "Dedicated project manager",
     ],
+    popular: true,
   },
   {
     name: "Enterprise",
     price: "Custom",
     period: "",
-    description: "For large organizations",
+    description: "For large organizations and government",
     features: [
-      "Unlimited everything",
-      "Self-hosted option",
-      "99.99% uptime SLA",
-      "Dedicated CSM",
-      "SOC 2 + HIPAA compliance",
+      "End-to-end enterprise systems",
+      "Multi-platform delivery",
+      "SOC 2 & security compliance",
+      "Ongoing maintenance & support",
+      "Long-term technical partnership",
     ],
   },
 ];
@@ -56,10 +58,11 @@ export default function Pricing() {
           className="text-center mb-16"
         >
           <h2 className="text-[26px] sm:text-[32px] font-bold text-white leading-[1.3]">
-            Simple, transparent pricing
+            Let&apos;s Talk About Your Project
           </h2>
           <p className="mt-4 text-base text-[#949fa6] max-w-[600px] mx-auto">
-            Start free, scale as you grow. No surprise bills, no vendor lock-in.
+            Every project is different. Tell us what you&apos;re building and we&apos;ll scope a solution
+            that fits your goals and budget.
           </p>
         </motion.div>
 
@@ -72,14 +75,14 @@ export default function Pricing() {
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.7, ease: appearEasing, delay: index * 0.1 }}
               className={`p-6 rounded-[12px] border bg-[#0e0e10] ${
-                index === 1
+                plan.popular
                   ? "border-[#eaa879]/40 shadow-[0_0_40px_rgba(234,168,121,0.08)]"
                   : "border-[#19191a]"
               }`}
             >
-              {index === 1 && (
+              {plan.popular && (
                 <div className="inline-block text-xs font-semibold px-3 py-1 rounded-[100px] bg-[#eaa879] text-[#0b0b0d] mb-4">
-                  Most popular
+                  Most Popular
                 </div>
               )}
               <div className="mb-6">
@@ -87,9 +90,6 @@ export default function Pricing() {
                 <p className="text-xs text-[#949fa6] mb-4">{plan.description}</p>
                 <div className="flex items-baseline gap-1">
                   <span className="text-[28px] font-bold text-white">{plan.price}</span>
-                  {plan.period && (
-                    <span className="text-sm text-[#949fa6]">{plan.period}</span>
-                  )}
                 </div>
               </div>
 
@@ -116,14 +116,14 @@ export default function Pricing() {
               </ul>
 
               <a
-                href="#"
+                href="#contact"
                 className={`block text-center py-2.5 rounded-[100px] text-sm font-semibold transition-colors ${
-                  index === 1
+                  plan.popular
                     ? "bg-white text-[#0b0b0d] hover:opacity-90"
                     : "border border-[#19191a] text-white hover:bg-white/5"
                 }`}
               >
-                {index === 2 ? "Contact sales" : "Get started"}
+                {plan.name === "Enterprise" ? "Contact Us" : "Get Started"}
               </a>
             </motion.div>
           ))}
