@@ -8,7 +8,7 @@ const manrope = Manrope({
   display: "swap",
 });
 
-const SITE_URL = "https://eraengines.vercel.app";
+const SITE_URL = "https://eraengines.com";
 const SITE_NAME = "Era Engines";
 const DEFAULT_DESCRIPTION =
   "Era Engines is a full-service software company specializing in custom software development, web & mobile applications, SaaS platforms, enterprise systems, AI integration, and cloud solutions for startups, SMEs, and large enterprises across the Middle East and Africa.";

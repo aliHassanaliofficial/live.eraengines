@@ -17,6 +17,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: "/",
       },
     ],
-    sitemap: "https://eraengines.vercel.app/sitemap.xml",
+    sitemap: "https://eraengines.com/sitemap.xml",
   };
 }
