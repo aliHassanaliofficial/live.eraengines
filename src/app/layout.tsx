@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Cairo, Manrope } from "next/font/google";
+import { cookies } from "next/headers";
+import Providers from "./components/providers";
+import { InlineScript } from "./components/inline-script";
+import EventPromoPopup from "./components/EventPromoPopup";
+import type { Lang } from "@/lib/i18n/translations";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -7,6 +12,17 @@ const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
 });
+
+const cairo = Cairo({
+  variable: "--font-cairo",
+  subsets: ["arabic"],
+  display: "swap",
+});
+
+const LANG_COOKIE = "era_lang";
+const THEME_COOKIE = "era_theme";
+
+const NO_FLASH_SCRIPT = `(function(){try{var t=localStorage.getItem("${THEME_COOKIE}");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}document.documentElement.classList.toggle("dark",t==="dark");document.documentElement.style.colorScheme=t;}catch(e){}try{var l=localStorage.getItem("${LANG_COOKIE}")||"en";document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";}catch(e){}})();`;
 
 const SITE_URL = "https://eraengines.com";
 const SITE_NAME = "Era Engines";
@@ -95,11 +111,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const lang: Lang = cookieStore.get(LANG_COOKIE)?.value === "ar" ? "ar" : "en";
+  const dark = cookieStore.get(THEME_COOKIE)?.value === "dark";
+  const dir = lang === "ar" ? "rtl" : "ltr";
+
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -185,29 +206,38 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${manrope.variable} h-full antialiased`}>
+    <html
+      lang={lang}
+      dir={dir}
+      suppressHydrationWarning
+      className={`${manrope.variable} ${cairo.variable} h-full antialiased ${dark ? "dark" : ""}`}
+    >
       <head>
+        <InlineScript html={NO_FLASH_SCRIPT} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema),
+            __html: JSON.stringify(organizationSchema).replace(/</g, "\\u003c"),
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteSchema),
+            __html: JSON.stringify(websiteSchema).replace(/</g, "\\u003c"),
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(localBusinessSchema),
+            __html: JSON.stringify(localBusinessSchema).replace(/</g, "\\u003c"),
           }}
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#0b0b0d] text-white font-sans">
-        {children}
+        <Providers initialLang={lang} initialTheme={dark ? "dark" : "light"}>
+          {children}
+        </Providers>
+        <EventPromoPopup />
       </body>
     </html>
   );

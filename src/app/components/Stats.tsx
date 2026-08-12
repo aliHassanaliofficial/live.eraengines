@@ -2,59 +2,36 @@
 
 import { motion } from "framer-motion";
 import { appearEasing } from "./animations";
-
-const stats = [
-  {
-    value: "50+",
-    label: "Projects delivered across web, mobile, and enterprise systems.",
-  },
-  {
-    value: "10+",
-    label: "Industries served — from healthcare and education to retail and logistics.",
-  },
-  {
-    value: "98%",
-    label: "Client satisfaction. Long-term partnerships, not one-time deliveries.",
-  },
-];
+import { useI18n } from "@/lib/i18n/I18nProvider";
+import SectionHeading from "./SectionHeading";
 
 export default function Stats() {
-  return (
-    <section className="py-[62px] sm:py-[120px] px-4 sm:px-8">
-      <div className="max-w-[1200px] mx-auto">
-        <motion.div
-          initial={{ opacity: 0.001, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.7, ease: appearEasing }}
-          className="text-center mb-16 max-w-[900px] mx-auto"
-        >
-          <h2 className="text-[26px] sm:text-[32px] font-bold text-white leading-[1.3]">
-            Era Engines by the Numbers
-          </h2>
-          <p className="mt-4 text-base text-[#949fa6] max-w-[500px] mx-auto leading-[1.6]">
-            Building world-class software, one project at a time.
-          </p>
-        </motion.div>
+  const { t } = useI18n();
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.value}
-              initial={{ opacity: 0.001, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.7, ease: appearEasing, delay: index * 0.1 }}
-              className="text-center"
-            >
-              <div className="text-[40px] sm:text-[48px] font-bold text-white leading-[1.2] mb-3">
-                {stat.value}
-              </div>
-              <p className="text-sm text-[#949fa6] leading-[1.6] max-w-xs mx-auto">
-                {stat.label}
-              </p>
-            </motion.div>
-          ))}
+  return (
+    <section className="px-4 py-[70px] sm:px-8 sm:py-24">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading title={t.stats.title} subtitle={t.stats.subtitle} />
+
+        <div className="relative mx-auto max-w-4xl">
+          <div className="absolute inset-0 -z-10 rounded-[32px] bg-gradient-to-r from-[var(--orb-a)] via-[var(--orb-b)] to-[var(--orb-c)] blur-2xl opacity-40" />
+          <div className="grid gap-4 rounded-[32px] glass p-6 sm:grid-cols-3 sm:p-10">
+            {t.stats.items.map((stat, index) => (
+              <motion.div
+                key={stat.value}
+                initial={{ opacity: 0.001, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.6, ease: appearEasing, delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-gradient text-5xl font-bold tracking-tight sm:text-6xl">
+                  {stat.value}
+                </div>
+                <p className="mx-auto mt-3 max-w-xs text-sm leading-[1.7] text-muted">{stat.label}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

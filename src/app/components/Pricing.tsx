@@ -1,115 +1,53 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { CheckIcon } from "@heroicons/react/24/outline";
 import { appearEasing } from "./animations";
-
-const plans = [
-  {
-    name: "Starter",
-    price: "Custom",
-    period: "",
-    description: "For startups and small businesses",
-    features: [
-      "Single web or mobile application",
-      "UI/UX design included",
-      "Cloud hosting setup",
-      "3 months post-launch support",
-      "1 revision cycle",
-    ],
-  },
-  {
-    name: "Growth",
-    price: "Custom",
-    period: "",
-    description: "For growing companies with complex needs",
-    features: [
-      "Full-stack custom development",
-      "API & third-party integrations",
-      "AI & automation features",
-      "6 months post-launch support",
-      "Dedicated project manager",
-    ],
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    period: "",
-    description: "For large organizations and government",
-    features: [
-      "End-to-end enterprise systems",
-      "Multi-platform delivery",
-      "SOC 2 & security compliance",
-      "Ongoing maintenance & support",
-      "Long-term technical partnership",
-    ],
-  },
-];
+import { useI18n } from "@/lib/i18n/I18nProvider";
+import SectionHeading from "./SectionHeading";
 
 export default function Pricing() {
-  return (
-    <section id="pricing" className="py-[62px] sm:py-[120px] px-4 sm:px-8">
-      <div className="max-w-[1200px] mx-auto">
-        <motion.div
-          initial={{ opacity: 0.001, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.7, ease: appearEasing }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-[26px] sm:text-[32px] font-bold text-white leading-[1.3]">
-            Let&apos;s Talk About Your Project
-          </h2>
-          <p className="mt-4 text-base text-[#949fa6] max-w-[600px] mx-auto">
-            Every project is different. Tell us what you&apos;re building and we&apos;ll scope a solution
-            that fits your goals and budget.
-          </p>
-        </motion.div>
+  const { t } = useI18n();
 
-        <div className="grid sm:grid-cols-3 gap-4 max-w-[1000px] mx-auto">
-          {plans.map((plan, index) => (
+  return (
+    <section id="pricing" className="relative overflow-hidden px-4 py-[70px] sm:px-8 sm:py-24">
+      <div className="orb animate-drift bg-[var(--orb-c)]" style={{ top: "10%", insetInlineStart: "-12%", width: 300, height: 300, opacity: 0.4 }} />
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading eyebrow={t.nav.pricing} title={t.pricing.title} subtitle={t.pricing.subtitle} />
+
+        <div className="grid gap-5 md:grid-cols-3">
+          {t.pricing.plans.map((plan, index) => (
             <motion.div
               key={plan.name}
-              initial={{ opacity: 0.001, y: 30 }}
+              initial={{ opacity: 0.001, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.7, ease: appearEasing, delay: index * 0.1 }}
-              className={`p-6 rounded-[12px] border bg-[#0e0e10] ${
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.6, ease: appearEasing, delay: index * 0.1 }}
+              className={`relative flex flex-col overflow-hidden rounded-[26px] p-7 ${
                 plan.popular
-                  ? "border-[#eaa879]/40 shadow-[0_0_40px_rgba(234,168,121,0.08)]"
-                  : "border-[#19191a]"
+                  ? "glass-strong ring-2 ring-accent/60 shadow-[0_18px_60px_-18px_var(--accent)]"
+                  : "glass glass-hover"
               }`}
             >
               {plan.popular && (
-                <div className="inline-block text-xs font-semibold px-3 py-1 rounded-[100px] bg-[#eaa879] text-[#0b0b0d] mb-4">
-                  Most Popular
-                </div>
+                <span className="absolute end-5 top-5 rounded-full bg-accent px-3 py-1 text-[11px] font-bold text-white">
+                  {t.pricing.popular}
+                </span>
               )}
-              <div className="mb-6">
-                <h3 className="text-lg font-bold text-white mb-1">{plan.name}</h3>
-                <p className="text-xs text-[#949fa6] mb-4">{plan.description}</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[28px] font-bold text-white">{plan.price}</span>
-                </div>
+
+              <h3 className="text-lg font-bold text-ink">{plan.name}</h3>
+              <p className="mt-1 text-xs text-muted">{plan.description}</p>
+
+              <div className="mt-6 flex items-baseline gap-2">
+                <span className="text-4xl font-bold tracking-tight text-ink">{plan.price}</span>
               </div>
 
-              <ul className="space-y-3 mb-8">
+              <ul className="mt-7 flex-1 space-y-3">
                 {plan.features.map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex items-center gap-2 text-sm text-[#949fa6]"
-                  >
-                    <svg
-                      className="w-4 h-4 text-[#eaa879] shrink-0"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                  <li key={feature} className="flex items-start gap-2.5 text-sm text-muted">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent-soft">
+                      <CheckIcon className="h-3 w-3 text-accent" />
+                    </span>
                     {feature}
                   </li>
                 ))}
@@ -117,13 +55,23 @@ export default function Pricing() {
 
               <a
                 href="#contact"
-                className={`block text-center py-2.5 rounded-[100px] text-sm font-semibold transition-colors ${
+                className={`mt-8 block rounded-full py-3 text-center text-sm font-semibold transition-transform hover:scale-[1.02] ${
                   plan.popular
-                    ? "bg-white text-[#0b0b0d] hover:opacity-90"
-                    : "border border-[#19191a] text-white hover:bg-white/5"
+                    ? "text-white"
+                    : "glass text-ink glass-hover"
                 }`}
+                style={
+                  plan.popular
+                    ? {
+                        backgroundImage: "linear-gradient(120deg, var(--accent), var(--accent-strong))",
+                        boxShadow: "0 12px 30px -10px var(--accent)",
+                      }
+                    : undefined
+                }
               >
-                {plan.name === "Enterprise" ? "Contact Us" : "Get Started"}
+                {index === t.pricing.plans.length - 1
+                  ? t.pricing.ctaContact
+                  : t.pricing.ctaStart}
               </a>
             </motion.div>
           ))}

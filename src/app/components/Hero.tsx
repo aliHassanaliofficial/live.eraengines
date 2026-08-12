@@ -1,84 +1,135 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { appearEasing } from "./animations";
+import {
+  CodeBracketIcon,
+  CubeIcon,
+  SparklesIcon,
+  CloudIcon,
+  ArrowDownIcon,
+} from "@heroicons/react/24/outline";
+import { useI18n } from "@/lib/i18n/I18nProvider";
+
+const appear = {
+  initial: { opacity: 0.001, y: 24 },
+  animate: { opacity: 1, y: 0 },
+};
+
+const chipIcons = [CodeBracketIcon, CubeIcon, SparklesIcon, CloudIcon];
 
 export default function Hero() {
-  return (
-    <section id="hero" className="relative pt-40 pb-20 sm:pt-48 sm:pb-28 overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#eaa879] rounded-full opacity-[0.03] blur-[40px] animate-pulse-glow" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-white rounded-full opacity-[0.02] blur-[40px] animate-pulse-glow" style={{ animationDelay: "2s" }} />
-      </div>
+  const { t, isRTL } = useI18n();
 
-      <div className="relative max-w-[1200px] mx-auto px-4 sm:px-8">
-        <div className="max-w-[900px] mx-auto text-center">
+  const chips = t.hero.chips.map((label, index) => ({
+    icon: chipIcons[index % chipIcons.length],
+    label,
+  }));
+
+  return (
+    <section
+      id="hero"
+      className="relative overflow-hidden px-4 pb-20 pt-16 sm:px-8 sm:pt-24 sm:pb-28"
+    >
+      <div className="absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)] pointer-events-none" />
+      <div className="orb animate-drift bg-[var(--orb-a)]" style={{ top: "-8%", insetInlineStart: "-6%", width: 480, height: 480 }} />
+      <div className="orb animate-drift bg-[var(--orb-b)]" style={{ top: "18%", insetInlineEnd: "-10%", width: 420, height: 420, animationDelay: "-6s" }} />
+      <div className="orb animate-drift bg-[var(--orb-c)]" style={{ bottom: "-18%", insetInlineStart: "30%", width: 420, height: 420, animationDelay: "-12s" }} />
+
+      <div className="relative mx-auto max-w-6xl">
+        <div className="mx-auto max-w-4xl text-center">
           <motion.div
-            initial={{ opacity: 0.001, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, ease: appearEasing }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#eaa879]/20 mb-6"
-            style={{ background: "rgba(234, 168, 121, 0.08)" }}
+            {...appear}
+            transition={{ duration: 0.7 }}
+            className="mx-auto mb-7 inline-flex items-center gap-2 rounded-full glass px-4 py-2"
           >
-            <span className="w-2 h-2 rounded-full bg-[#eaa879] animate-pulse" />
-            <span className="text-xs font-medium text-[#eaa879]">
-              New Era, Special Engines.
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
             </span>
+            <span className="text-xs font-semibold text-accent">{t.hero.badge}</span>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0.001, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, ease: appearEasing, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.2] tracking-tight text-white"
-            style={{ fontFamily: "Manrope" }}
+            {...appear}
+            transition={{ duration: 0.7, delay: 0.08 }}
+            className="text-4xl font-bold leading-[1.15] tracking-tight text-ink sm:text-6xl lg:text-7xl"
           >
-            Build Software That{" "}
-            <span className="bg-gradient-to-r from-[#eaa879] to-[#d4956a] bg-clip-text text-transparent">
-              Solves Real Problems.
-            </span>
+            {t.hero.titleA}{" "}
+            <span className="text-gradient">{t.hero.titleHighlight}</span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0.001, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, ease: appearEasing, delay: 0.2 }}
-            className="mt-6 text-base sm:text-lg text-[#949fa6] max-w-[650px] mx-auto leading-[1.6]"
+            {...appear}
+            transition={{ duration: 0.7, delay: 0.16 }}
+            className="mx-auto mt-6 max-w-2xl text-base leading-[1.7] text-muted sm:text-lg"
           >
-            Era Engines is a full-service software company. We design, build, and maintain
-            custom web applications, mobile apps, SaaS platforms, and enterprise systems for
-            startups, SMEs, and large enterprises across the region.
+            {t.hero.subtitle}
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0.001, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, ease: appearEasing, delay: 0.3 }}
-            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+            {...appear}
+            transition={{ duration: 0.7, delay: 0.24 }}
+            className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
             <a
               href="#contact"
-              className="inline-block bg-white text-[#0b0b0d] px-8 py-3.5 rounded-[100px] text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-semibold text-white transition-transform hover:scale-[1.03] sm:w-auto"
+              style={{
+                backgroundImage: "linear-gradient(120deg, var(--accent), var(--accent-strong))",
+                boxShadow: "0 14px 34px -10px var(--accent)",
+              }}
             >
-              Get Free Consultation
+              {t.hero.ctaPrimary}
             </a>
             <a
               href="#services"
-              className="inline-block text-[#949fa6] px-8 py-3.5 rounded-[100px] text-sm font-semibold border border-[#19191a] hover:border-[#eaa879]/30 hover:text-white transition-colors"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-semibold text-ink glass glass-hover sm:w-auto"
             >
-              Explore Our Services
+              {t.hero.ctaSecondary}
             </a>
           </motion.div>
 
           <motion.p
-            initial={{ opacity: 0.001, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, ease: appearEasing, delay: 0.4 }}
-            className="mt-6 text-sm text-[#949fa6]/60 max-w-[500px] mx-auto leading-[1.6]"
+            {...appear}
+            transition={{ duration: 0.7, delay: 0.32 }}
+            className="mt-6 text-sm text-muted/80"
           >
-            No commitment. Just a conversation about what you&apos;re building and how we can help.
+            {t.hero.note}
           </motion.p>
         </div>
+
+        <motion.div
+          {...appear}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="mx-auto mt-16 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4"
+        >
+          {chips.map((chip) => (
+            <div
+              key={chip.label}
+              className="flex flex-col items-center gap-2 rounded-2xl glass glass-hover px-4 py-5 text-center"
+            >
+              <chip.icon className="h-6 w-6 text-accent" />
+              <span className="text-xs font-semibold text-ink">{chip.label}</span>
+            </div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.8 }}
+          className="mt-16 flex justify-center"
+        >
+          <a
+            href="#services"
+            aria-label="Scroll down"
+            className={`grid h-11 w-11 place-items-center rounded-full glass glass-hover text-muted ${
+              isRTL ? "animate-bounce" : "animate-bounce"
+            }`}
+          >
+            <ArrowDownIcon className="h-5 w-5" />
+          </a>
+        </motion.div>
       </div>
     </section>
   );
