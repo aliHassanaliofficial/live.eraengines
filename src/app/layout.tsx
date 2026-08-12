@@ -64,16 +64,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
+    alternateLocale: ["ar_EG"],
     url: SITE_URL,
     siteName: SITE_NAME,
     title: "Era Engines | Custom Software Development Company",
     description: DEFAULT_DESCRIPTION,
     images: [
       {
-        url: "/favicon.ico",
-        width: 800,
-        height: 800,
-        alt: "Era Engines - Custom Software Development Company",
+        url: `${SITE_URL}/opengraph-image`,
+        width: 1200,
+        height: 630,
+        alt: "Era Engines | Custom Software Development Company",
       },
     ],
   },
@@ -81,7 +82,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Era Engines | Custom Software Development Company",
     description: DEFAULT_DESCRIPTION,
-    images: ["/favicon.ico"],
+    images: [`${SITE_URL}/opengraph-image`],
     creator: "@eraengines",
   },
   robots: {
@@ -97,6 +98,11 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
+    languages: {
+      "x-default": SITE_URL,
+      en: SITE_URL,
+      ar: SITE_URL,
+    },
   },
   icons: {
     icon: "/favicon.ico",
