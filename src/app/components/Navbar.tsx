@@ -56,7 +56,7 @@ export default function Navbar() {
           }`}
           style={{ height: scrolled ? "56px" : "48px" }}
         >
-          <a href="#hero" className="flex shrink-0 items-center gap-2.5">
+          <a href="/" className="flex shrink-0 items-center gap-2.5">
             <Image
               src="/800x800_white_logo.png"
               alt="Era Engines"

@@ -11,6 +11,11 @@ import {
   PhoneIcon,
   TrashIcon,
   LockClosedIcon,
+  PhotoIcon,
+  ArrowUpTrayIcon,
+  XMarkIcon,
+  ArrowDownTrayIcon,
+  GlobeAltIcon,
 } from "@heroicons/react/24/outline";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import ThemeToggle from "../components/ThemeToggle";
@@ -18,6 +23,7 @@ import LanguageToggle from "../components/LanguageToggle";
 import { appearEasing } from "../components/animations";
 
 type Status = "new" | "contacted" | "done";
+type AdminTab = "consultations" | "branding" | "social";
 
 interface Consultation {
   id: string;
@@ -30,6 +36,26 @@ interface Consultation {
   message: string | null;
   status: string;
   preferred_date: string | null;
+  created_at: string;
+}
+
+interface BrandingLogo {
+  id: string;
+  title: string;
+  category: string;
+  file_url: string;
+  file_path: string;
+  file_size: number | null;
+  mime_type: string | null;
+  created_at: string;
+}
+
+interface SocialLink {
+  id: string;
+  platform: string;
+  url: string;
+  label: string;
+  sort_order: number;
   created_at: string;
 }
 
@@ -65,6 +91,28 @@ export default function AdminPage() {
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+
+  const [activeTab, setActiveTab] = useState<AdminTab>("consultations");
+
+  const [brandingLogos, setBrandingLogos] = useState<BrandingLogo[] | null>(null);
+  const [brandingError, setBrandingError] = useState("");
+  const [brandingCategoryFilter, setBrandingCategoryFilter] = useState<string>("all");
+  const [uploadTitle, setUploadTitle] = useState("");
+  const [uploadCategory, setUploadCategory] = useState("");
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadMsg, setUploadMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [deletingLogoId, setDeletingLogoId] = useState<string | null>(null);
+
+  const [socialLinks, setSocialLinks] = useState<SocialLink[] | null>(null);
+  const [socialError, setSocialError] = useState("");
+  const [socialPlatform, setSocialPlatform] = useState("");
+  const [socialUrl, setSocialUrl] = useState("");
+  const [socialLabel, setSocialLabel] = useState("");
+  const [socialSaving, setSocialSaving] = useState(false);
+  const [editingSocialId, setEditingSocialId] = useState<string | null>(null);
+  const [deletingSocialId, setDeletingSocialId] = useState<string | null>(null);
 
   const searchRef = useRef<string>("");
   const loadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -236,6 +284,189 @@ export default function AdminPage() {
     }
   }
 
+  async function loadBranding() {
+    try {
+      const res = await fetch("/api/admin/branding", { cache: "no-store" });
+      if (res.status === 401) {
+        setAuthed(false);
+        return;
+      }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setBrandingError(body.error || "Failed to load logos.");
+        return;
+      }
+      const body = (await res.json()) as { data: BrandingLogo[] };
+      setBrandingError("");
+      setBrandingLogos(body.data);
+    } catch {
+      setBrandingError("Failed to load logos.");
+    }
+  }
+
+  useEffect(() => {
+    if (authed && activeTab === "branding") {
+      loadBranding();
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+  }, [authed, activeTab]);
+
+  async function handleUploadLogo(e: React.FormEvent) {
+    e.preventDefault();
+    if (!uploadFile || !uploadTitle.trim() || !uploadCategory.trim()) return;
+    setUploading(true);
+    setUploadMsg(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", uploadFile);
+      formData.append("title", uploadTitle.trim());
+      formData.append("category", uploadCategory.trim());
+      const res = await fetch("/api/admin/branding", {
+        method: "POST",
+        body: formData,
+      });
+      if (res.status === 401) {
+        setAuthed(false);
+        return;
+      }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setUploadMsg({ type: "err", text: body.error || t.branding.uploadError });
+        return;
+      }
+      setUploadMsg({ type: "ok", text: t.branding.uploadSuccess });
+      setUploadTitle("");
+      setUploadCategory("");
+      setUploadFile(null);
+      loadBranding();
+    } catch {
+      setUploadMsg({ type: "err", text: t.branding.uploadError });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleDeleteLogo(id: string) {
+    if (!window.confirm(t.branding.deleteConfirm)) return;
+    setDeletingLogoId(id);
+    setBrandingError("");
+    try {
+      const res = await fetch(`/api/admin/branding?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      if (res.status === 401) {
+        setAuthed(false);
+        return;
+      }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setBrandingError(body.error || "Failed to delete.");
+        return;
+      }
+      setBrandingLogos((prev) => (prev ?? []).filter((l) => l.id !== id));
+    } catch {
+      setBrandingError("Failed to delete.");
+    } finally {
+      setDeletingLogoId(null);
+    }
+  }
+
+  const allCategories = useMemo(() => {
+    const cats = new Set<string>();
+    for (const logo of brandingLogos ?? []) cats.add(logo.category);
+    return Array.from(cats).sort();
+  }, [brandingLogos]);
+
+  const filteredLogos = useMemo(() => {
+    const list = brandingLogos ?? [];
+    if (brandingCategoryFilter === "all") return list;
+    return list.filter((l) => l.category === brandingCategoryFilter);
+  }, [brandingLogos, brandingCategoryFilter]);
+
+  async function loadSocialLinks() {
+    try {
+      const res = await fetch("/api/admin/social-links", { cache: "no-store" });
+      if (res.status === 401) { setAuthed(false); return; }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setSocialError(body.error || "Failed to load social links.");
+        return;
+      }
+      const body = (await res.json()) as { data: SocialLink[] };
+      setSocialError("");
+      setSocialLinks(body.data);
+    } catch {
+      setSocialError("Failed to load social links.");
+    }
+  }
+
+  useEffect(() => {
+    if (authed && activeTab === "social") {
+      loadSocialLinks();
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+  }, [authed, activeTab]);
+
+  async function handleSaveSocial(e: React.FormEvent) {
+    e.preventDefault();
+    if (!socialPlatform.trim() || !socialUrl.trim()) return;
+    setSocialSaving(true);
+    try {
+      if (editingSocialId) {
+        const res = await fetch("/api/admin/social-links", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: editingSocialId, platform: socialPlatform, url: socialUrl, label: socialLabel }),
+        });
+        if (res.status === 401) { setAuthed(false); return; }
+        if (!res.ok) { setSocialError(t.socialLinks.error); return; }
+        const body = (await res.json()) as { data: SocialLink };
+        setSocialLinks((prev) => (prev ?? []).map((l) => l.id === editingSocialId ? body.data : l));
+      } else {
+        const res = await fetch("/api/admin/social-links", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ platform: socialPlatform, url: socialUrl, label: socialLabel, sort_order: (socialLinks?.length ?? 0) }),
+        });
+        if (res.status === 401) { setAuthed(false); return; }
+        if (!res.ok) { setSocialError(t.socialLinks.error); return; }
+        const body = (await res.json()) as { data: SocialLink };
+        setSocialLinks((prev) => [...(prev ?? []), body.data]);
+      }
+      setSocialPlatform("");
+      setSocialUrl("");
+      setSocialLabel("");
+      setEditingSocialId(null);
+      setSocialError("");
+    } catch {
+      setSocialError(t.socialLinks.error);
+    } finally {
+      setSocialSaving(false);
+    }
+  }
+
+  async function handleDeleteSocial(id: string) {
+    if (!window.confirm(t.socialLinks.deleteConfirm)) return;
+    setDeletingSocialId(id);
+    setSocialError("");
+    try {
+      const res = await fetch(`/api/admin/social-links?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (res.status === 401) { setAuthed(false); return; }
+      if (!res.ok) { setSocialError("Failed to delete."); return; }
+      setSocialLinks((prev) => (prev ?? []).filter((l) => l.id !== id));
+      if (editingSocialId === id) {
+        setEditingSocialId(null);
+        setSocialPlatform("");
+        setSocialUrl("");
+        setSocialLabel("");
+      }
+    } catch {
+      setSocialError("Failed to delete.");
+    } finally {
+      setDeletingSocialId(null);
+    }
+  }
+
   const statCards: { label: string; value: number; filter: Status | "all" }[] = [
     { label: t.admin.total, value: data?.length ?? 0, filter: "all" },
     { label: t.admin.new, value: counts.new, filter: "new" },
@@ -342,208 +573,586 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {statCards.map((card) => (
-            <button
-              key={card.label}
-              type="button"
-              onClick={() => setFilter(card.filter)}
-              className={`rounded-[20px] p-5 text-start transition-all ${
-                filter === card.filter
-                  ? "glass-strong ring-2 ring-accent/50"
-                  : "glass glass-hover"
-              }`}
-            >
-              <div className="text-xs font-semibold uppercase tracking-wider text-muted">
-                {card.label}
-              </div>
-              <div className="mt-1 text-3xl font-bold text-ink">{card.value}</div>
-            </button>
-          ))}
+        <div className="mt-6 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab("consultations")}
+            className={`rounded-full px-5 py-2.5 text-sm font-semibold transition ${
+              activeTab === "consultations" ? "text-white" : "glass glass-hover text-ink"
+            }`}
+            style={
+              activeTab === "consultations"
+                ? { backgroundImage: "linear-gradient(120deg, var(--accent), var(--accent-strong))" }
+                : undefined
+            }
+          >
+            {t.admin.consultationsTab}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("branding")}
+            className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition ${
+              activeTab === "branding" ? "text-white" : "glass glass-hover text-ink"
+            }`}
+            style={
+              activeTab === "branding"
+                ? { backgroundImage: "linear-gradient(120deg, var(--accent), var(--accent-strong))" }
+                : undefined
+            }
+          >
+            <PhotoIcon className="h-4 w-4" />
+            {t.admin.brandingTab}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("social")}
+            className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition ${
+              activeTab === "social" ? "text-white" : "glass glass-hover text-ink"
+            }`}
+            style={
+              activeTab === "social"
+                ? { backgroundImage: "linear-gradient(120deg, var(--accent), var(--accent-strong))" }
+                : undefined
+            }
+          >
+            <GlobeAltIcon className="h-4 w-4" />
+            {t.socialLinks.title}
+          </button>
         </div>
 
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <MagnifyingGlassIcon className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={t.admin.search}
-              className="w-full rounded-full border border-border-glass bg-surface py-3 ps-10 pe-4 text-sm text-ink placeholder:text-muted/60 transition focus:border-accent/70 focus:ring-2 focus:ring-accent/25"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            {["all", ...STATUS_ORDER].map((status) => (
-              <button
-                key={status}
-                type="button"
-                onClick={() => setFilter(status as Status | "all")}
-                className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
-                  filter === status
-                    ? "text-white"
-                    : "glass glass-hover text-ink"
-                }`}
-                style={
-                  filter === status
-                    ? {
-                        backgroundImage:
-                          "linear-gradient(120deg, var(--accent), var(--accent-strong))",
-                      }
-                    : undefined
-                }
-              >
-                {status === "all" ? t.admin.all : t.admin[status as Status]}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {error && (
-          <p className="mt-4 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
-            {error}
-          </p>
-        )}
-
-        <div className="mt-6 space-y-3">
-          {data === null ? (
-            <div className="flex justify-center py-16">
-              <div className="h-10 w-10 animate-spin rounded-full border-2 border-border-glass border-t-accent" />
-            </div>
-          ) : data.length === 0 ? (
-            <div className="glass rounded-[24px] py-16 text-center">
-              <p className="text-sm text-muted">{t.admin.noResults}</p>
-            </div>
-          ) : (
-            data.map((row, index) => {
-              const open = expanded === row.id;
-              const status = STATUS_ORDER.includes(row.status as Status)
-                ? (row.status as Status)
-                : "new";
-              return (
-                <motion.div
-                  key={row.id}
-                  initial={{ opacity: 0.001, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, ease: appearEasing, delay: Math.min(index, 8) * 0.03 }}
-                  className={`overflow-hidden rounded-[22px] transition-colors ${
-                    open ? "glass-strong" : "glass glass-hover"
+        {activeTab === "consultations" ? (
+          <>
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {statCards.map((card) => (
+                <button
+                  key={card.label}
+                  type="button"
+                  onClick={() => setFilter(card.filter)}
+                  className={`rounded-[20px] p-5 text-start transition-all ${
+                    filter === card.filter
+                      ? "glass-strong ring-2 ring-accent/50"
+                      : "glass glass-hover"
                   }`}
                 >
+                  <div className="text-xs font-semibold uppercase tracking-wider text-muted">
+                    {card.label}
+                  </div>
+                  <div className="mt-1 text-3xl font-bold text-ink">{card.value}</div>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="relative flex-1">
+                <MagnifyingGlassIcon className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  placeholder={t.admin.search}
+                  className="w-full rounded-full border border-border-glass bg-surface py-3 ps-10 pe-4 text-sm text-ink placeholder:text-muted/60 transition focus:border-accent/70 focus:ring-2 focus:ring-accent/25"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                {["all", ...STATUS_ORDER].map((status) => (
                   <button
+                    key={status}
                     type="button"
-                    onClick={() => setExpanded(open ? null : row.id)}
-                    className="flex w-full cursor-pointer items-center gap-4 p-5 text-start"
+                    onClick={() => setFilter(status as Status | "all")}
+                    className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
+                      filter === status
+                        ? "text-white"
+                        : "glass glass-hover text-ink"
+                    }`}
+                    style={
+                      filter === status
+                        ? {
+                            backgroundImage:
+                              "linear-gradient(120deg, var(--accent), var(--accent-strong))",
+                          }
+                        : undefined
+                    }
                   >
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-accent-soft text-sm font-bold text-accent">
-                      {row.name.trim().charAt(0).toUpperCase() || "?"}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <span className="truncate text-sm font-bold text-ink">{row.name}</span>
-                        <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${STATUS_STYLES[status]}`}>
-                          {t.admin[status]}
-                        </span>
-                      </div>
-                      <div className="mt-0.5 flex flex-wrap items-center gap-x-4 gap-y-0.5 text-xs text-muted">
-                        <span className="inline-flex items-center gap-1">
-                          <EnvelopeIcon className="h-3.5 w-3.5" />
-                          {row.email}
-                        </span>
-                        {row.phone && (
-                          <span className="inline-flex items-center gap-1">
-                            <PhoneIcon className="h-3.5 w-3.5" />
-                            {row.phone}
-                          </span>
-                        )}
-                        <span>{formatDate(row.created_at, lang)}</span>
-                      </div>
-                    </div>
-                    {open ? (
-                      <ChevronUpIcon className="h-5 w-5 shrink-0 text-muted" />
-                    ) : (
-                      <ChevronDownIcon className="h-5 w-5 shrink-0 text-muted" />
-                    )}
+                    {status === "all" ? t.admin.all : t.admin[status as Status]}
                   </button>
+                ))}
+              </div>
+            </div>
 
-                  <AnimatePresence initial={false}>
-                    {open && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: "easeInOut" }}
-                        className="overflow-hidden"
+            {error && (
+              <p className="mt-4 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+                {error}
+              </p>
+            )}
+
+            <div className="mt-6 space-y-3">
+              {data === null ? (
+                <div className="flex justify-center py-16">
+                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-border-glass border-t-accent" />
+                </div>
+              ) : data.length === 0 ? (
+                <div className="glass rounded-[24px] py-16 text-center">
+                  <p className="text-sm text-muted">{t.admin.noResults}</p>
+                </div>
+              ) : (
+                data.map((row, index) => {
+                  const open = expanded === row.id;
+                  const status = STATUS_ORDER.includes(row.status as Status)
+                    ? (row.status as Status)
+                    : "new";
+                  return (
+                    <motion.div
+                      key={row.id}
+                      initial={{ opacity: 0.001, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, ease: appearEasing, delay: Math.min(index, 8) * 0.03 }}
+                      className={`overflow-hidden rounded-[22px] transition-colors ${
+                        open ? "glass-strong" : "glass glass-hover"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setExpanded(open ? null : row.id)}
+                        className="flex w-full cursor-pointer items-center gap-4 p-5 text-start"
                       >
-                        <div className="grid gap-4 border-t border-border-glass px-5 pb-5 pt-4 sm:grid-cols-2">
-                          {[
-                            { label: t.admin.phone, value: row.phone },
-                            { label: t.admin.company, value: row.company },
-                            { label: t.admin.service, value: row.service },
-                            { label: t.admin.budget, value: row.budget },
-                            { label: t.admin.preferredDate, value: row.preferred_date },
-                            { label: t.admin.date, value: formatDate(row.created_at, lang) },
-                          ].map((item) => (
-                            <div key={item.label}>
-                              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">
-                                {item.label}
-                              </div>
-                              <div className="mt-0.5 break-words text-sm font-medium text-ink">
-                                {item.value || "—"}
-                              </div>
-                            </div>
-                          ))}
-                          <div className="sm:col-span-2">
-                            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">
-                              {t.admin.message}
-                            </div>
-                            <p className="mt-0.5 whitespace-pre-wrap text-sm leading-[1.7] text-ink">
-                              {row.message || "—"}
-                            </p>
+                        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-accent-soft text-sm font-bold text-accent">
+                          {row.name.trim().charAt(0).toUpperCase() || "?"}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span className="truncate text-sm font-bold text-ink">{row.name}</span>
+                            <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${STATUS_STYLES[status]}`}>
+                              {t.admin[status]}
+                            </span>
                           </div>
-
-                          <div className="flex flex-wrap items-end justify-between gap-4 sm:col-span-2">
-                            <div>
-                              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted">
-                                {t.admin.status}
-                              </label>
-                              <div className="flex items-center gap-2">
-                                {STATUS_ORDER.map((s) => (
-                                  <button
-                                    key={s}
-                                    type="button"
-                                    disabled={busyId === row.id}
-                                    onClick={() => changeStatus(row.id, s)}
-                                    className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition disabled:opacity-50 ${
-                                      status === s
-                                        ? STATUS_STYLES[s]
-                                        : "border-border-glass text-muted hover:text-ink"
-                                    }`}
-                                  >
-                                    {t.admin[s]}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              disabled={busyId === row.id}
-                              onClick={() => handleDelete(row.id)}
-                              className="inline-flex items-center gap-2 rounded-full border border-red-400/40 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-500/20 disabled:opacity-50 dark:text-red-400"
-                            >
-                              <TrashIcon className="h-4 w-4" />
-                              {t.admin.delete}
-                            </button>
+                          <div className="mt-0.5 flex flex-wrap items-center gap-x-4 gap-y-0.5 text-xs text-muted">
+                            <span className="inline-flex items-center gap-1">
+                              <EnvelopeIcon className="h-3.5 w-3.5" />
+                              {row.email}
+                            </span>
+                            {row.phone && (
+                              <span className="inline-flex items-center gap-1">
+                                <PhoneIcon className="h-3.5 w-3.5" />
+                                {row.phone}
+                              </span>
+                            )}
+                            <span>{formatDate(row.created_at, lang)}</span>
                           </div>
                         </div>
+                        {open ? (
+                          <ChevronUpIcon className="h-5 w-5 shrink-0 text-muted" />
+                        ) : (
+                          <ChevronDownIcon className="h-5 w-5 shrink-0 text-muted" />
+                        )}
+                      </button>
+
+                      <AnimatePresence initial={false}>
+                        {open && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="grid gap-4 border-t border-border-glass px-5 pb-5 pt-4 sm:grid-cols-2">
+                              {[
+                                { label: t.admin.phone, value: row.phone },
+                                { label: t.admin.company, value: row.company },
+                                { label: t.admin.service, value: row.service },
+                                { label: t.admin.budget, value: row.budget },
+                                { label: t.admin.preferredDate, value: row.preferred_date },
+                                { label: t.admin.date, value: formatDate(row.created_at, lang) },
+                              ].map((item) => (
+                                <div key={item.label}>
+                                  <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">
+                                    {item.label}
+                                  </div>
+                                  <div className="mt-0.5 break-words text-sm font-medium text-ink">
+                                    {item.value || "—"}
+                                  </div>
+                                </div>
+                              ))}
+                              <div className="sm:col-span-2">
+                                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">
+                                  {t.admin.message}
+                                </div>
+                                <p className="mt-0.5 whitespace-pre-wrap text-sm leading-[1.7] text-ink">
+                                  {row.message || "—"}
+                                </p>
+                              </div>
+
+                              <div className="flex flex-wrap items-end justify-between gap-4 sm:col-span-2">
+                                <div>
+                                  <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted">
+                                    {t.admin.status}
+                                  </label>
+                                  <div className="flex items-center gap-2">
+                                    {STATUS_ORDER.map((s) => (
+                                      <button
+                                        key={s}
+                                        type="button"
+                                        disabled={busyId === row.id}
+                                        onClick={() => changeStatus(row.id, s)}
+                                        className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition disabled:opacity-50 ${
+                                          status === s
+                                            ? STATUS_STYLES[s]
+                                            : "border-border-glass text-muted hover:text-ink"
+                                        }`}
+                                      >
+                                        {t.admin[s]}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  disabled={busyId === row.id}
+                                  onClick={() => handleDelete(row.id)}
+                                  className="inline-flex items-center gap-2 rounded-full border border-red-400/40 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-500/20 disabled:opacity-50 dark:text-red-400"
+                                >
+                                  <TrashIcon className="h-4 w-4" />
+                                  {t.admin.delete}
+                                </button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                })
+              )}
+            </div>
+          </>
+        ) : activeTab === "branding" ? (
+          <>
+            <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_2fr]">
+              <div className="glass-strong rounded-[24px] p-6">
+                <h2 className="text-lg font-bold text-ink">{t.branding.uploadTitle}</h2>
+                <form onSubmit={handleUploadLogo} className="mt-5 space-y-4">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-muted">{t.branding.titleLabel}</label>
+                    <input
+                      type="text"
+                      value={uploadTitle}
+                      onChange={(e) => setUploadTitle(e.target.value)}
+                      placeholder={t.branding.titlePlaceholder}
+                      className="w-full rounded-xl border border-border-glass bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-muted/60 transition focus:border-accent/70 focus:ring-2 focus:ring-accent/25"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-muted">{t.branding.categoryLabel}</label>
+                    <input
+                      type="text"
+                      value={uploadCategory}
+                      onChange={(e) => setUploadCategory(e.target.value)}
+                      placeholder={t.branding.categoryPlaceholder}
+                      list="branding-categories"
+                      className="w-full rounded-xl border border-border-glass bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-muted/60 transition focus:border-accent/70 focus:ring-2 focus:ring-accent/25"
+                    />
+                    <datalist id="branding-categories">
+                      {allCategories.map((cat) => (
+                        <option key={cat} value={cat} />
+                      ))}
+                    </datalist>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-muted">{t.branding.fileLabel}</label>
+                    <div
+                      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                      onDragLeave={() => setDragOver(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setDragOver(false);
+                        const file = e.dataTransfer.files[0];
+                        if (file) setUploadFile(file);
+                      }}
+                      onClick={() => document.getElementById("branding-file-input")?.click()}
+                      className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition ${
+                        dragOver
+                          ? "border-accent bg-accent-soft"
+                          : "border-border-glass bg-surface hover:border-accent/50"
+                      }`}
+                    >
+                      {uploadFile ? (
+                        <>
+                          <div className="relative">
+                            <img
+                              src={URL.createObjectURL(uploadFile)}
+                              alt="Preview"
+                              className="h-20 w-20 rounded-lg object-contain"
+                            />
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); setUploadFile(null); }}
+                              className="absolute -right-2 -top-2 rounded-full bg-red-500 p-0.5 text-white"
+                            >
+                              <XMarkIcon className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                          <span className="text-xs text-muted">{uploadFile.name}</span>
+                        </>
+                      ) : (
+                        <>
+                          <ArrowUpTrayIcon className="h-8 w-8 text-muted" />
+                          <span className="text-sm text-ink">{t.branding.dragDrop}</span>
+                          <span className="text-xs text-muted">{t.branding.dragDropHint}</span>
+                        </>
+                      )}
+                    </div>
+                    <input
+                      id="branding-file-input"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setUploadFile(file);
+                      }}
+                    />
+                  </div>
+                  {uploadMsg && (
+                    <p className={`rounded-xl border px-4 py-3 text-sm ${
+                      uploadMsg.type === "ok"
+                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : "border-red-400/40 bg-red-500/10 text-red-600 dark:text-red-400"
+                    }`}>
+                      {uploadMsg.text}
+                    </p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={uploading || !uploadFile || !uploadTitle.trim() || !uploadCategory.trim()}
+                    className="w-full rounded-full py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
+                    style={{
+                      backgroundImage: "linear-gradient(120deg, var(--accent), var(--accent-strong))",
+                      boxShadow: "0 12px 30px -10px var(--accent)",
+                    }}
+                  >
+                    {uploading ? t.branding.uploading : t.branding.upload}
+                  </button>
+                </form>
+              </div>
+
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setBrandingCategoryFilter("all")}
+                    className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
+                      brandingCategoryFilter === "all"
+                        ? "text-white"
+                        : "glass glass-hover text-ink"
+                    }`}
+                    style={
+                      brandingCategoryFilter === "all"
+                        ? { backgroundImage: "linear-gradient(120deg, var(--accent), var(--accent-strong))" }
+                        : undefined
+                    }
+                  >
+                    {t.branding.allCategories}
+                  </button>
+                  {allCategories.map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setBrandingCategoryFilter(cat)}
+                      className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
+                        brandingCategoryFilter === cat
+                          ? "text-white"
+                          : "glass glass-hover text-ink"
+                      }`}
+                      style={
+                        brandingCategoryFilter === cat
+                          ? { backgroundImage: "linear-gradient(120deg, var(--accent), var(--accent-strong))" }
+                          : undefined
+                      }
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
+                {brandingError && (
+                  <p className="mb-4 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+                    {brandingError}
+                  </p>
+                )}
+
+                {brandingLogos === null ? (
+                  <div className="flex justify-center py-16">
+                    <div className="h-10 w-10 animate-spin rounded-full border-2 border-border-glass border-t-accent" />
+                  </div>
+                ) : filteredLogos.length === 0 ? (
+                  <div className="glass rounded-[24px] py-16 text-center">
+                    <p className="text-sm text-muted">{brandingCategoryFilter === "all" ? t.branding.noLogos : t.branding.noLogosCategory}</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {filteredLogos.map((logo, index) => (
+                      <motion.div
+                        key={logo.id}
+                        initial={{ opacity: 0.001, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: appearEasing, delay: Math.min(index, 8) * 0.03 }}
+                        className="glass rounded-[20px] p-4"
+                      >
+                        <div className="flex aspect-square items-center justify-center rounded-xl bg-white/50 p-3 dark:bg-white/5">
+                          <img
+                            src={logo.file_url}
+                            alt={logo.title}
+                            className="max-h-full max-w-full object-contain"
+                          />
+                        </div>
+                        <div className="mt-3">
+                          <p className="truncate text-sm font-bold text-ink">{logo.title}</p>
+                          <p className="mt-0.5 text-xs text-muted">{logo.category}</p>
+                        </div>
+                        <button
+                          type="button"
+                          disabled={deletingLogoId === logo.id}
+                          onClick={() => handleDeleteLogo(logo.id)}
+                          className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-red-400/40 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-500/20 disabled:opacity-50 dark:text-red-400"
+                        >
+                          <TrashIcon className="h-3.5 w-3.5" />
+                          {t.branding.delete}
+                        </button>
                       </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="mt-6 max-w-2xl">
+              <div className="glass-strong rounded-[24px] p-6">
+                <h2 className="text-lg font-bold text-ink">{t.socialLinks.addTitle}</h2>
+                <form onSubmit={handleSaveSocial} className="mt-5 space-y-4">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-muted">{t.socialLinks.platformLabel}</label>
+                    <input
+                      type="text"
+                      value={socialPlatform}
+                      onChange={(e) => setSocialPlatform(e.target.value)}
+                      placeholder={t.socialLinks.platformPlaceholder}
+                      className="w-full rounded-xl border border-border-glass bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-muted/60 transition focus:border-accent/70 focus:ring-2 focus:ring-accent/25"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-muted">{t.socialLinks.urlLabel}</label>
+                    <input
+                      type="url"
+                      value={socialUrl}
+                      onChange={(e) => setSocialUrl(e.target.value)}
+                      placeholder={t.socialLinks.urlPlaceholder}
+                      className="w-full rounded-xl border border-border-glass bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-muted/60 transition focus:border-accent/70 focus:ring-2 focus:ring-accent/25"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-muted">{t.socialLinks.labelLabel}</label>
+                    <input
+                      type="text"
+                      value={socialLabel}
+                      onChange={(e) => setSocialLabel(e.target.value)}
+                      placeholder={t.socialLinks.labelPlaceholder}
+                      className="w-full rounded-xl border border-border-glass bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-muted/60 transition focus:border-accent/70 focus:ring-2 focus:ring-accent/25"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="submit"
+                      disabled={socialSaving || !socialPlatform.trim() || !socialUrl.trim()}
+                      className="rounded-full px-6 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
+                      style={{
+                        backgroundImage: "linear-gradient(120deg, var(--accent), var(--accent-strong))",
+                      }}
+                    >
+                      {editingSocialId ? t.socialLinks.save : t.socialLinks.add}
+                    </button>
+                    {editingSocialId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingSocialId(null);
+                          setSocialPlatform("");
+                          setSocialUrl("");
+                          setSocialLabel("");
+                        }}
+                        className="rounded-full glass glass-hover px-5 py-2.5 text-sm font-semibold text-ink"
+                      >
+                        {t.socialLinks.cancel}
+                      </button>
                     )}
-                  </AnimatePresence>
-                </motion.div>
-              );
-            })
-          )}
-        </div>
+                  </div>
+                </form>
+                {socialError && (
+                  <p className="mt-4 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+                    {socialError}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-6 space-y-3">
+                {socialLinks === null ? (
+                  <div className="flex justify-center py-16">
+                    <div className="h-10 w-10 animate-spin rounded-full border-2 border-border-glass border-t-accent" />
+                  </div>
+                ) : socialLinks.length === 0 ? (
+                  <div className="glass rounded-[24px] py-16 text-center">
+                    <p className="text-sm text-muted">{t.socialLinks.noLinks}</p>
+                  </div>
+                ) : (
+                  socialLinks.map((link, index) => (
+                    <motion.div
+                      key={link.id}
+                      initial={{ opacity: 0.001, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, ease: appearEasing, delay: Math.min(index, 8) * 0.03 }}
+                      className="glass rounded-[20px] p-5"
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-sm font-bold text-accent">
+                          {link.platform.charAt(0).toUpperCase()}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-ink">{link.platform}</p>
+                          <p className="truncate text-xs text-muted">{link.url}</p>
+                          {link.label && <p className="text-xs text-muted/70">{link.label}</p>}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingSocialId(link.id);
+                              setSocialPlatform(link.platform);
+                              setSocialUrl(link.url);
+                              setSocialLabel(link.label || "");
+                            }}
+                            className="rounded-full glass glass-hover px-3 py-1.5 text-xs font-semibold text-ink"
+                          >
+                            {t.socialLinks.edit}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={deletingSocialId === link.id}
+                            onClick={() => handleDeleteSocial(link.id)}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-red-400/40 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-500/20 disabled:opacity-50 dark:text-red-400"
+                          >
+                            <TrashIcon className="h-3.5 w-3.5" />
+                            {t.socialLinks.delete}
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

@@ -13,7 +13,6 @@ import {
 } from "@heroicons/react/24/outline";
 
 const EVENT_URL = "/events/rotaractsunrise-hiddenpoisons";
-const STORAGE_KEY = "era_promo_hidden_poisons";
 
 const EVENT_THEME = {
   "--hp-bg": "oklch(14% 0.006 260)",
@@ -34,21 +33,9 @@ export default function EventPromoPopup() {
   useEffect(() => {
     if (pathname !== "/") return;
     let active = true;
-    let shown = false;
-    try {
-      shown = sessionStorage.getItem(STORAGE_KEY) === "1";
-    } catch {
-      // ignore storage errors
-    }
-    if (shown) return;
     const timer = setTimeout(() => {
       if (!active) return;
       setOpen(true);
-      try {
-        sessionStorage.setItem(STORAGE_KEY, "1");
-      } catch {
-        // ignore storage errors
-      }
     }, 1200);
     return () => {
       active = false;

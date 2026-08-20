@@ -132,3 +132,156 @@ export async function deleteConsultation(id: string): Promise<void> {
     method: "DELETE",
   });
 }
+
+const BRANDING_BUCKET = "branding-logos";
+
+export interface BrandingLogo {
+  id: string;
+  title: string;
+  category: string;
+  file_url: string;
+  file_path: string;
+  file_size: number | null;
+  mime_type: string | null;
+  created_at: string;
+}
+
+export interface BrandingLogoCreate {
+  title: string;
+  category: string;
+  file_url: string;
+  file_path: string;
+  file_size?: number;
+  mime_type?: string;
+}
+
+export async function createBrandingLogo(data: BrandingLogoCreate): Promise<BrandingLogo> {
+  const res = await supabaseFetch("/rest/v1/branding_logos", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify(data),
+  });
+  const rows = (await res.json()) as BrandingLogo[];
+  return rows[0];
+}
+
+export async function listBrandingLogos(category?: string): Promise<BrandingLogo[]> {
+  const params = new URLSearchParams();
+  params.set("select", "*");
+  params.set("order", "created_at.desc");
+  if (category) {
+    params.set("category", `eq.${category}`);
+  }
+  const res = await supabaseFetch(`/rest/v1/branding_logos?${params.toString()}`);
+  return (await res.json()) as BrandingLogo[];
+}
+
+export async function deleteBrandingLogo(id: string): Promise<void> {
+  await supabaseFetch(`/rest/v1/branding_logos?id=eq.${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+}
+
+export async function uploadBrandingFile(
+  path: string,
+  file: ArrayBuffer,
+  contentType: string
+): Promise<void> {
+  ensureEnv();
+  const res = await fetch(
+    `${SUPABASE_URL}/storage/v1/object/${BRANDING_BUCKET}/${path}`,
+    {
+      method: "POST",
+      headers: {
+        apikey: SERVICE_ROLE_KEY!,
+        Authorization: `Bearer ${SERVICE_ROLE_KEY!}`,
+        "Content-Type": contentType,
+        "x-upsert": "true",
+      },
+      body: file,
+    }
+  );
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new SupabaseError(
+      `Storage upload failed (${res.status}): ${text.slice(0, 300)}`,
+      res.status
+    );
+  }
+}
+
+export async function deleteBrandingFile(path: string): Promise<void> {
+  ensureEnv();
+  const res = await fetch(
+    `${SUPABASE_URL}/storage/v1/object/${BRANDING_BUCKET}/${path}`,
+    {
+      method: "DELETE",
+      headers: {
+        apikey: SERVICE_ROLE_KEY!,
+        Authorization: `Bearer ${SERVICE_ROLE_KEY!}`,
+      },
+    }
+  );
+  if (!res.ok && res.status !== 404) {
+    const text = await res.text().catch(() => "");
+    throw new SupabaseError(
+      `Storage delete failed (${res.status}): ${text.slice(0, 300)}`,
+      res.status
+    );
+  }
+}
+
+export function getBrandingFileUrl(path: string): string {
+  ensureEnv();
+  return `${SUPABASE_URL}/storage/v1/object/public/${BRANDING_BUCKET}/${path}`;
+}
+
+export interface SocialLink {
+  id: string;
+  platform: string;
+  url: string;
+  label: string;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface SocialLinkCreate {
+  platform: string;
+  url: string;
+  label?: string;
+  sort_order?: number;
+}
+
+export async function createSocialLink(data: SocialLinkCreate): Promise<SocialLink> {
+  const res = await supabaseFetch("/rest/v1/social_links", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify(data),
+  });
+  const rows = (await res.json()) as SocialLink[];
+  return rows[0];
+}
+
+export async function listSocialLinks(): Promise<SocialLink[]> {
+  const res = await supabaseFetch("/rest/v1/social_links?select=*&order=sort_order.asc");
+  return (await res.json()) as SocialLink[];
+}
+
+export async function updateSocialLink(
+  id: string,
+  patch: Partial<Pick<SocialLink, "platform" | "url" | "label" | "sort_order">>
+): Promise<SocialLink | null> {
+  const res = await supabaseFetch(`/rest/v1/social_links?id=eq.${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify(patch),
+  });
+  const rows = (await res.json()) as SocialLink[];
+  return rows[0] ?? null;
+}
+
+export async function deleteSocialLink(id: string): Promise<void> {
+  await supabaseFetch(`/rest/v1/social_links?id=eq.${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+}

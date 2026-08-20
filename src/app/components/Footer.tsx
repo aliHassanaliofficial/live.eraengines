@@ -1,11 +1,29 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useI18n } from "@/lib/i18n/I18nProvider";
+
+interface SocialLink {
+  id: string;
+  platform: string;
+  url: string;
+  label: string;
+  sort_order: number;
+  created_at: string;
+}
 
 export default function Footer() {
   const { t } = useI18n();
   const year = new Date().getFullYear();
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+
+  useEffect(() => {
+    fetch("/api/social-links", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((body) => setSocialLinks(body.data ?? []))
+      .catch(() => {});
+  }, []);
 
   const columns = [
     {
@@ -29,10 +47,27 @@ export default function Footer() {
     {
       title: t.nav.contact,
       links: [
-        { label: "hello@eraengines.com", href: "mailto:hello@eraengines.com" },
+        { label: "info@eraengines.com", href: "mailto:info@eraengines.com" },
         { label: t.contact.info.location, href: "#contact" },
       ],
     },
+    {
+      title: t.nav.branding,
+      links: [
+        { label: t.branding.accessCenter, href: "/branding" },
+      ],
+    },
+    ...(socialLinks.length > 0
+      ? [
+          {
+            title: t.contact.info.follow,
+            links: socialLinks.map((link) => ({
+              label: link.label || link.platform,
+              href: link.url,
+            })),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -66,7 +101,7 @@ export default function Footer() {
                 <ul className="mt-4 space-y-2.5">
                   {column.links.map((link) => (
                     <li key={link.label}>
-                      <a href={link.href} className="text-sm text-muted transition-colors hover:text-accent">
+                      <a href={link.href} target="_blank" rel="noopener noreferrer" className="text-sm text-muted transition-colors hover:text-accent">
                         {link.label}
                       </a>
                     </li>
